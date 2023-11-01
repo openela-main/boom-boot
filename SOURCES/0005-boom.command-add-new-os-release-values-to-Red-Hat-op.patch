@@ -1,0 +1,35 @@
+From cd0c4e28b0b2de9000edd5b4b56612d610337552 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Tue, 14 Jun 2022 09:31:33 -0400
+Subject: [PATCH 5/5] boom.command: add new os-release values to Red Hat
+ optional keys list
+
+Add "Red Hat Enterprise Linux" (NAME for el8 onwards), and "Fedora
+Linux" (NAME for fc35 onwards) to the table of names to automatically
+enable grub optional keys for.
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+(cherry picked from commit 0cb2d8da9de6fa01ebc5193e7ab6710a9c7b7125)
+---
+ boom/command.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/boom/command.py b/boom/command.py
+index 0ef66ee..07c0616 100644
+--- a/boom/command.py
++++ b/boom/command.py
+@@ -1094,9 +1094,11 @@ def _default_optional_keys(osp):
+     """
+     all_optional_keys = "grub_users grub_arg grub_class id"
+     _default_optional_keys = [
++        "Red Hat Enterprise Linux",
+         "Red Hat Enterprise Linux Server",
+         "Red Hat Enterprise Linux Workstation",
+         "CentOS Linux",
++        "Fedora Linux",
+         "Fedora"
+     ]
+     if osp.os_name in _default_optional_keys:
+-- 
+2.34.3
+

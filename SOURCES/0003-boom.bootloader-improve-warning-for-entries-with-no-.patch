@@ -1,0 +1,47 @@
+From faf43a2b923dd2e558da1e48978541389844f464 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Tue, 14 Jun 2022 07:50:11 -0400
+Subject: [PATCH 3/5] boom.bootloader: improve warning for entries with no
+ root_device
+
+A boot entry with no root_device= is invalid. Log the path to the file
+rather than the boot_id since this may have changed if the entry is
+corrupt/modified, and is not included in the file name for system
+provided boot entries.
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+(cherry picked from commit b70d2ad6a4b8f7ef7816426bcb18b6f247a52dca)
+---
+ boom/bootloader.py        | 3 +--
+ tests/bootloader_tests.py | 1 +
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/boom/bootloader.py b/boom/bootloader.py
+index 185195d..bbf7fd5 100644
+--- a/boom/bootloader.py
++++ b/boom/bootloader.py
+@@ -720,8 +720,7 @@ class BootParams(object):
+             # The root_device key is handled specially since it is required
+             # for a valid BootEntry.
+             if name == 'root_device' and not value:
+-                _log_warn("Entry with boot_id=%s has no root_device"
+-                          % be.boot_id)
++                _log_warn("No root_device for entry at %s" % be._last_path)
+                 setattr(bp, name, "")
+ 
+         def is_add(opt):
+diff --git a/tests/bootloader_tests.py b/tests/bootloader_tests.py
+index 129000d..ace82bd 100644
+--- a/tests/bootloader_tests.py
++++ b/tests/bootloader_tests.py
+@@ -158,6 +158,7 @@ class MockBootEntry(object):
+     expand_options = "root=/dev/mapper/rhel-root ro rhgb quiet"
+     _osp = None
+     _entry_data = {}
++    _last_path = "/some/path/to/somewhere"
+ 
+ 
+ class BootEntryBasicTests(unittest.TestCase):
+-- 
+2.34.3
+

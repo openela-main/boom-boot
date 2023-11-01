@@ -1,0 +1,43 @@
+From a3e33031fb4051eb9d76f950b536b513c58be861 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Tue, 14 Jun 2022 07:47:04 -0400
+Subject: [PATCH 2/5] boom.bootloader: initialise _last_path before parsing
+ BootEntry
+
+The path from which a boot entry was read can be useful context for
+logging messages, particularly when a boot entry has been corrupted or
+manually edited (so that the boot_id no longer matches the expected
+value).
+
+Move the initialisation of this member before parsing the boot entry, so
+that the value is available for log messages.
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+(cherry picked from commit fafa77556e442fe4f016c23eb9739f1015fa9eb8)
+---
+ boom/bootloader.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/boom/bootloader.py b/boom/bootloader.py
+index aa9131f..185195d 100644
+--- a/boom/bootloader.py
++++ b/boom/bootloader.py
+@@ -1484,6 +1484,7 @@ class BootEntry(object):
+ 
+         entry_basename = basename(entry_file)
+         _log_debug("Loading BootEntry from '%s'" % entry_basename)
++        self._last_path = entry_file
+ 
+         with open(entry_file, "r") as ef:
+             for line in ef:
+@@ -1536,7 +1537,6 @@ class BootEntry(object):
+                           entry_basename)
+                 self.read_only = True
+ 
+-        self._last_path = entry_file
+         self._unwritten = False
+ 
+     def __init__(self, title=None, machine_id=None, osprofile=None,
+-- 
+2.34.3
+
