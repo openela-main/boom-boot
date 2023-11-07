@@ -1,0 +1,31 @@
+From 841e7d3d0dc7ad194e0b82d8cd0930cef1a95301 Mon Sep 17 00:00:00 2001
+From: Marian Csontos <mcsontos@redhat.com>
+Date: Fri, 29 Nov 2019 10:23:44 +0100
+Subject: [PATCH 1/5] man: Fix line starting with '
+
+Lines starting with ' result in macro not defined warnings:
+
+    1117: warning: macro `boom' not defined
+    1118: warning: macro `+'' not defined
+---
+ man/man8/boom.8 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/man/man8/boom.8 b/man/man8/boom.8
+index 7b862e7..9eee048 100644
+--- a/man/man8/boom.8
++++ b/man/man8/boom.8
+@@ -1168,8 +1168,8 @@ describing the properties of the configured host profiles.
+ 
+ The list of fields to display is given with \fB--options\fP as a comma
+ separated list of field names. To obtain a list of available fields run
+-'\fBboom host list -o help\fP'. If the list of fields begins with the
+-'\fB+\fP' character the specified fields are appended to the default
++\&'\fBboom host list -o help\fP'. If the list of fields begins with the
++\&'\fB+\fP' character the specified fields are appended to the default
+ field list. Otherwise the given list of fields replaces the default set
+ of report fields.
+ 
+-- 
+2.34.3
+
