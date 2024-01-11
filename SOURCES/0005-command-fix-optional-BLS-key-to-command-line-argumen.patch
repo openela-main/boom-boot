@@ -1,0 +1,54 @@
+ boom/command.py        |  5 +++--
+ tests/command_tests.py | 16 ++++++++++++++++
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/boom/command.py b/boom/command.py
+index c9c2f6b..feb5b65 100644
+--- a/boom/command.py
++++ b/boom/command.py
+@@ -1883,7 +1883,8 @@ def _optional_key_to_arg(optional_key):
+     _key_map = {
+         BOOM_ENTRY_GRUB_USERS: "--grub-users",
+         BOOM_ENTRY_GRUB_ARG: "--grub-arg",
+-        BOOM_ENTRY_GRUB_CLASS: "--grub-class"
++        BOOM_ENTRY_GRUB_CLASS: "--grub-class",
++        BOOM_ENTRY_GRUB_ID: "--grub-id"
+     }
+     return _key_map[optional_key] if optional_key in _key_map else None
+ 
+@@ -1914,7 +1915,7 @@ def _set_optional_key_defaults(profile, cmd_args):
+         if bls_key not in profile.optional_keys:
+             if getattr(cmd_args, bls_key) is not None:
+                 print("Profile with os_id='%s' does not support %s" %
+-                      (profile.disp_os_id, _optional_key_to_arg(bls_key)))
++                      (profile.disp_os_id, _optional_key_to_arg(opt_key)))
+                 return 1
+         else:
+             if getattr(cmd_args, bls_key) is None:
+diff --git a/tests/command_tests.py b/tests/command_tests.py
+index 00cda3b..d7a766a 100644
+--- a/tests/command_tests.py
++++ b/tests/command_tests.py
+@@ -244,6 +244,22 @@ class CommandHelperTests(unittest.TestCase):
+         (add_opts, del_opts) = _merge_add_del_opts(bp, to_add, to_del)
+         self.assertEqual(["log_buf_len=16M", "debug"], add_opts)
+ 
++    def test__optional_key_to_arg_valid(self):
++        _optional_key_to_arg = boom.command._optional_key_to_arg
++        valid_keys_and_args = {
++            "BOOM_ENTRY_GRUB_USERS": "--grub-users",
++            "BOOM_ENTRY_GRUB_ARG": "--grub-arg",
++            "BOOM_ENTRY_GRUB_CLASS": "--grub-class",
++            "BOOM_ENTRY_GRUB_ID": "--grub-id"
++        }
++        for opt_key in valid_keys_and_args.keys():
++            self.assertEqual(_optional_key_to_arg(opt_key),
++                             valid_keys_and_args[opt_key])
++
++    def test__optional_key_to_arg_invalid(self):
++        _optional_key_to_arg = boom.command._optional_key_to_arg
++        self.assertEqual(_optional_key_to_arg("INVALID_KEY"), None)
++
+ 
+ # Default test OsProfile identifiers
+ test_os_id = "9cb53ddda889d6285fd9ab985a4c47025884999f"
