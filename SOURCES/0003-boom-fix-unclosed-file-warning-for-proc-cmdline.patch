@@ -1,0 +1,28 @@
+From f82215bded722e972a2b358ddd6a45bc36a4a3bb Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Thu, 4 May 2023 18:23:31 +0100
+Subject: [PATCH 3/3] boom: fix unclosed file warning for /proc/cmdline
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+(cherry picked from commit bd194eeb646198c28f3e79769175c0cf0843e523)
+---
+ boom/command.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/boom/command.py b/boom/command.py
+index 37172dc..07d229a 100644
+--- a/boom/command.py
++++ b/boom/command.py
+@@ -1923,7 +1923,8 @@ def os_options_from_cmdline():
+     options = ""
+     vg_lv_name = None
+     have_root = False
+-    cmdline = open("/proc/cmdline").read().strip()
++    with open("/proc/cmdline") as proc_cmdline:
++        cmdline = proc_cmdline.read().strip()
+     for word in cmdline.split():
+         if word.startswith("root="):
+             have_root = True
+-- 
+2.40.1
+

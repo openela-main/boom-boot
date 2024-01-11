@@ -1,0 +1,210 @@
+From 82ba6ea6411d728f7d3b203caa0710641f74188d Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Thu, 4 May 2023 15:11:59 +0100
+Subject: [PATCH 1/3] Fix typos across tree
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+(cherry picked from commit 2ee6810bfbd9e356f2bee3eac4e3b3b87ed21814)
+---
+ README.md                   |  6 +++---
+ boom/bootloader.py          | 12 ++++++------
+ boom/cache.py               |  2 +-
+ boom/command.py             |  2 +-
+ boom/report.py              |  4 ++--
+ boom/stratis.py             |  2 +-
+ tests/bootloader_tests.py   |  2 +-
+ tests/command_tests.py      |  2 +-
+ tests/loader/entries/README |  2 +-
+ 9 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/README.md b/README.md
+index a1747c2..c6b4ef4 100644
+--- a/README.md
++++ b/README.md
+@@ -325,7 +325,7 @@ BootEntry.
+ #### boom cache command
+ 
+ The `boom cache` command gives information about the paths and
+-images stored in the boom boot iamge cache. The `boom cache list`
++images stored in the boom boot image cache. The `boom cache list`
+ command gives information on cache entries in a tabular report
+ format similar to other `list` commands.
+ 
+@@ -484,7 +484,7 @@ Created profile with os_id d4439b7:
+   Options: "root=%{root_device} ro %{root_opts}"
+ ```
+ 
+-The `--uname-pattern` `OsProfile` property is an otional but recommended
++The `--uname-pattern` `OsProfile` property is an optional but recommended
+ pattern (regular expression) that should match the UTS release (`uname`)
+ strings reported by the operating system.
+ 
+@@ -673,7 +673,7 @@ boot entries:
+ ```
+ 
+ ## Python API
+-Boom also supports programatic use via a Python API. The API is flexible
++Boom also supports programmatic use via a Python API. The API is flexible
+ and allows greater customisation than is possible using the command line
+ tool.
+ 
+diff --git a/boom/bootloader.py b/boom/bootloader.py
+index fdd8c0c..89efd4a 100644
+--- a/boom/bootloader.py
++++ b/boom/bootloader.py
+@@ -407,7 +407,7 @@ class BootParams(object):
+             string. The string returned is in the form of a call to the
+             ``BootParams`` constructor.
+ 
+-            :returns: a machine readable string represenatation of this
++            :returns: a machine readable string representation of this
+                       ``BootParams`` object.
+         """
+         return self.__str(quote=True, prefix="BootParams(", suffix=")")
+@@ -1198,7 +1198,7 @@ class BootEntry(object):
+ 
+             Return a copy of this ``BootEntry``'s values as a list.
+ 
+-            :returns: the current list of ``BotoEntry`` values.
++            :returns: the current list of ``BootEntry`` values.
+             :rtype: list
+         """
+         values = list(self._entry_data.values())
+@@ -1259,7 +1259,7 @@ class BootEntry(object):
+         self._unwritten = True
+ 
+     def __os_id_from_comment(self, comment):
+-        """Retrive OsProfile from BootEntry comment.
++        """Retrieve OsProfile from BootEntry comment.
+ 
+             Attempt to set this BootEntry's OsProfile using a comment
+             string stored in the entry file. The comment must be of the
+@@ -1300,7 +1300,7 @@ class BootEntry(object):
+             Attempt to guess the correct ``OsProfile`` to use with
+             this ``BootEntry`` by probing each loaded ``OsProfile``
+             in turn until a profile recognises the entry. If no match
+-            is found the entrie's ``OsProfile`` is set to ``None``.
++            is found the entry's ``OsProfile`` is set to ``None``.
+ 
+             Probing is only used in the case that a loaded entry has
+             no embedded OsIdentifier string. All entries written by
+@@ -1527,7 +1527,7 @@ class BootEntry(object):
+ 
+             A ``BootParams`` object may be supplied using the
+             ``boot_params`` keyword argument. The object will be used to
+-            provide values for subsitution using the patterns defined by
++            provide values for substitution using the patterns defined by
+             the configured ``OsProfile``.
+ 
+             If ``entry_file`` is specified the ``BootEntry`` will be
+@@ -1832,7 +1832,7 @@ class BootEntry(object):
+         return True
+ 
+     def expanded(self):
+-        """Return a string represenatation of this ``BootEntry``, with
++        """Return a string representation of this ``BootEntry``, with
+             any bootloader environment variables expanded to their
+             current values.
+ 
+diff --git a/boom/cache.py b/boom/cache.py
+index dfd8a32..6024f91 100644
+--- a/boom/cache.py
++++ b/boom/cache.py
+@@ -174,7 +174,7 @@ def _image_id_from_path(img_path):
+ def drop_cache():
+     """Discard the in-memory cache state. Calling this function has
+         no effect on the persistent cache state but will free all
+-        in-memory represenatations and clear the cache index.
++        in-memory representations and clear the cache index.
+     """
+     global _index, _paths, _images
+     _index = {}
+diff --git a/boom/command.py b/boom/command.py
+index 696313d..ecd8153 100644
+--- a/boom/command.py
++++ b/boom/command.py
+@@ -3233,7 +3233,7 @@ def main(args):
+     parser.add_argument("-u", "--uname-pattern", "--unamepattern",
+                         help="A Boom OsProfile uname pattern",
+                         metavar="PATTERN", type=str)
+-    parser.add_argument("-V", "--verbose", help="Enable verbose ouput",
++    parser.add_argument("-V", "--verbose", help="Enable verbose output",
+                         action="count")
+     parser.add_argument("-v", "--version", metavar="VERSION", type=str,
+                         help="The kernel version of a boom "
+diff --git a/boom/report.py b/boom/report.py
+index f7ff4a1..fdbd3ab 100644
+--- a/boom/report.py
++++ b/boom/report.py
+@@ -446,7 +446,7 @@ class BoomReport(object):
+             Display a list of valid fields for this ``BoomReport``.
+ 
+             :param fields: The list of fields to display
+-            :param display_field_types: A boolean controling whether
++            :param display_field_types: A boolean controlling whether
+                                         field types (str, SHA, num)
+                                         are included in help output
+         """
+@@ -837,7 +837,7 @@ class BoomReport(object):
+                 each sort key defines its own sort order.
+ 
+                 :param row_a: The first row to compare
+-                :param row_b: The seconf row to compare
++                :param row_b: The second row to compare
+             """
+             for cnt in range(0, row_a._report._keys_count):
+                 sfa = row_a._sort_fields[cnt]
+diff --git a/boom/stratis.py b/boom/stratis.py
+index 350bc18..ca79d7b 100644
+--- a/boom/stratis.py
++++ b/boom/stratis.py
+@@ -49,7 +49,7 @@ _STRATISD_SERVICE = "org.storage.stratis3"
+ _STRATISD_PATH = "/org/storage/stratis3"
+ #: The DBus name of the pool interface
+ _POOL_IFACE = "org.storage.stratis3.pool.r0"
+-#: The DBus timeout for stratisd in miliseconds
++#: The DBus timeout for stratisd in milliseconds
+ _STRATISD_TIMEOUT = 120000
+ 
+ #: The DBus ObjectManager interface implemented by stratisd
+diff --git a/tests/bootloader_tests.py b/tests/bootloader_tests.py
+index 8238d10..e56f2f9 100644
+--- a/tests/bootloader_tests.py
++++ b/tests/bootloader_tests.py
+@@ -1081,7 +1081,7 @@ class BootLoaderTestsCheckRoot(unittest.TestCase):
+         Device types in the del_devs list are currently ignored.
+ 
+         Tests using this base class require root privileges in order
+-        to manipulate device nodes in the test sanbox. These tests
++        to manipulate device nodes in the test sandbox. These tests
+         are automatically skipped if the suite is run as a normal
+         user.
+     """
+diff --git a/tests/command_tests.py b/tests/command_tests.py
+index 7af5ea2..5aa904f 100644
+--- a/tests/command_tests.py
++++ b/tests/command_tests.py
+@@ -2071,7 +2071,7 @@ class CommandTests(unittest.TestCase):
+         self.assertEqual(r, 0)
+ 
+     def test__edit_profile_cmd(self):
+-        """Test the _edit_profile_cmd() hander with default args.
++        """Test the _edit_profile_cmd() handler with default args.
+         """
+         args = MockArgs()
+         args.profile = "d4439b7"
+diff --git a/tests/loader/entries/README b/tests/loader/entries/README
+index 20ee65b..4407ef2 100644
+--- a/tests/loader/entries/README
++++ b/tests/loader/entries/README
+@@ -1,6 +1,6 @@
+ Boot loader entry directory for the boom unit test suite.
+ 
+-The entries in this directory may contan synthetic test data:
++The entries in this directory may contain synthetic test data:
+ non-existent kernel versions, and mock OsProfile data.
+ 
+ For examples of actual boom boot entries please refer to the
+-- 
+2.40.1
+

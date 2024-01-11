@@ -1,0 +1,214 @@
+From f98bacd55fd4af5e1efee3fedd90c2c57d99cae7 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Thu, 4 May 2023 16:37:26 +0100
+Subject: [PATCH 2/3] Fix system vs. project import ordering
+
+Resolves: #5
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+(cherry picked from commit d8a7c9f2fbeecd4e291cda751c2dcbd4b1914d75)
+---
+ boom/bootloader.py  | 10 +++++-----
+ boom/cache.py       |  6 +++---
+ boom/command.py     | 16 ++++++++--------
+ boom/config.py      |  4 ++--
+ boom/hostprofile.py |  6 +++---
+ boom/legacy.py      |  6 +++---
+ boom/osprofile.py   |  3 ++-
+ boom/report.py      |  3 ++-
+ 8 files changed, 28 insertions(+), 26 deletions(-)
+
+diff --git a/boom/bootloader.py b/boom/bootloader.py
+index 89efd4a..cdee6d9 100644
+--- a/boom/bootloader.py
++++ b/boom/bootloader.py
+@@ -39,11 +39,6 @@ is also provided in the ``MAP_KEY`` member).
+ """
+ from __future__ import print_function
+ 
+-from boom import *
+-from boom.osprofile import *
+-from boom.hostprofile import find_host_profiles
+-from boom.stratis import *
+-
+ from os.path import basename, exists as path_exists, join as path_join
+ from subprocess import Popen, PIPE
+ from tempfile import mkstemp
+@@ -51,6 +46,11 @@ from os import listdir, rename, fdopen, chmod, unlink, fdatasync, stat, dup
+ from stat import S_ISBLK
+ from hashlib import sha1
+ import logging
++
++from boom import *
++from boom.osprofile import *
++from boom.hostprofile import find_host_profiles
++from boom.stratis import *
+ import re
+ 
+ #: The path to the BLS boot entries directory relative to /boot
+diff --git a/boom/cache.py b/boom/cache.py
+index 6024f91..b68caac 100644
+--- a/boom/cache.py
++++ b/boom/cache.py
+@@ -17,9 +17,6 @@ images required to load boom-defined boot entries.
+ """
+ from __future__ import print_function
+ 
+-from boom import *
+-from boom.bootloader import *
+-
+ from hashlib import sha1
+ from os import chmod, chown, fdatasync, listdir, stat, unlink
+ from stat import S_ISREG, ST_MODE, ST_UID, ST_GID, ST_MTIME, filemode
+@@ -32,6 +29,9 @@ from errno import ENOENT
+ import shutil
+ import logging
+ 
++from boom import *
++from boom.bootloader import *
++
+ # Module logging configuration
+ _log = logging.getLogger(__name__)
+ _log.set_debug_mask(BOOM_DEBUG_CACHE)
+diff --git a/boom/command.py b/boom/command.py
+index ecd8153..37172dc 100644
+--- a/boom/command.py
++++ b/boom/command.py
+@@ -26,6 +26,14 @@ reports using the ``boom.report`` module.
+ """
+ from __future__ import print_function
+ 
++from os import environ, uname, getcwd
++from os.path import basename, exists as path_exists, isabs, join, sep
++from argparse import ArgumentParser
++from stat import filemode
++import platform
++import logging
++import re
++
+ from boom import *
+ from boom.osprofile import *
+ from boom.report import *
+@@ -35,14 +43,6 @@ from boom.legacy import *
+ from boom.config import *
+ from boom.cache import *
+ 
+-from os import environ, uname, getcwd
+-from os.path import basename, exists as path_exists, isabs, join, sep
+-from argparse import ArgumentParser
+-from stat import filemode
+-import platform
+-import logging
+-import re
+-
+ #: The environment variable from which to take the location of the
+ #: ``/boot`` file system.
+ BOOM_BOOT_PATH_ENV = "BOOM_BOOT_PATH"
+diff --git a/boom/config.py b/boom/config.py
+index c58d3c3..9dae545 100644
+--- a/boom/config.py
++++ b/boom/config.py
+@@ -20,14 +20,14 @@ the values of configuration keys defined in the boom configuration file.
+ """
+ from __future__ import print_function
+ 
+-from boom import *
+-
+ from os.path import dirname
+ 
+ from os import fdopen, rename, chmod, fdatasync
+ from tempfile import mkstemp
+ import logging
+ 
++from boom import *
++
+ try:
+     # Python2
+     from ConfigParser import SafeConfigParser as ConfigParser, ParsingError
+diff --git a/boom/hostprofile.py b/boom/hostprofile.py
+index d63622f..fea9753 100644
+--- a/boom/hostprofile.py
++++ b/boom/hostprofile.py
+@@ -31,14 +31,14 @@ property names) are identical to those used by the ``OsProfile`` class.
+ """
+ from __future__ import print_function
+ 
+-from boom import *
+-from boom.osprofile import *
+-
+ from hashlib import sha1
+ from os.path import join as path_join
+ import logging
+ import string
+ 
++from boom import *
++from boom.osprofile import *
++
+ # Module logging configuration
+ _log = logging.getLogger(__name__)
+ _log.set_debug_mask(BOOM_DEBUG_PROFILE)
+diff --git a/boom/legacy.py b/boom/legacy.py
+index 389ed90..715358c 100644
+--- a/boom/legacy.py
++++ b/boom/legacy.py
+@@ -20,9 +20,6 @@ all entries from the legacy configuration file.
+ """
+ from __future__ import print_function
+ 
+-from boom import *
+-from boom.bootloader import *
+-
+ from subprocess import Popen, PIPE
+ from os.path import dirname, exists, isabs, join as path_join
+ from os import chmod, dup, fdatasync, fdopen, rename, unlink
+@@ -30,6 +27,9 @@ from tempfile import mkstemp
+ import logging
+ import re
+ 
++from boom import *
++from boom.bootloader import *
++
+ #: Format strings use to construct begin/end markers
+ BOOM_LEGACY_BEGIN_FMT = "#--- BOOM_%s_BEGIN ---"
+ BOOM_LEGACY_END_FMT = "#--- BOOM_%s_END ---"
+diff --git a/boom/osprofile.py b/boom/osprofile.py
+index f05671f..e20d2fb 100644
+--- a/boom/osprofile.py
++++ b/boom/osprofile.py
+@@ -34,7 +34,6 @@ are suitable for display use and are used by default by the
+ """
+ from __future__ import print_function
+ 
+-from boom import *
+ from hashlib import sha1
+ from tempfile import mkstemp
+ from os.path import basename, join as path_join, exists as path_exists
+@@ -42,6 +41,8 @@ from os import fdopen, rename, chmod, unlink, fdatasync
+ import logging
+ import re
+ 
++from boom import *
++
+ #: Boom profiles directory name.
+ BOOM_PROFILES = "profiles"
+ 
+diff --git a/boom/report.py b/boom/report.py
+index fdbd3ab..d024013 100644
+--- a/boom/report.py
++++ b/boom/report.py
+@@ -29,10 +29,11 @@ mapper reports.
+ """
+ from __future__ import print_function
+ 
+-from boom import find_minimum_sha_prefix, BOOM_DEBUG_REPORT
+ import logging
+ import sys
+ 
++from boom import find_minimum_sha_prefix, BOOM_DEBUG_REPORT
++
+ _log = logging.getLogger(__name__)
+ _log.set_debug_mask(BOOM_DEBUG_REPORT)
+ 
+-- 
+2.40.1
+
