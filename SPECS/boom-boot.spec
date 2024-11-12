@@ -2,7 +2,7 @@
 %global sphinx_docs 1
 
 Name:		boom-boot
-Version:	1.6.0
+Version:	1.6.1
 Release:	2%{?dist}
 Summary:	%{summary}
 
@@ -139,6 +139,19 @@ rm doc/conf.py
 
 
 %changelog
+* Tue May 21 2024 Bryan Gurney <bgurney@redhat.com> - 1.6.1-2
+- Add issues resolved by release 1.6.1
+- Resolves: RHEL-36001
+- Resolves: RHEL-36664
+- Resolves: RHEL-36667
+- Resolves: RHEL-36691
+
+* Mon May 20 2024 Bryan Gurney <bgurney@redhat.com> - 1.6.1-1
+- Update to release 1.6.1.
+
+* Tue Dec 05 2023 Marian Csontos <mcsontos@redhat.com> - 1.6.0-2
+- Add dependency on systemd version
+
 * Wed Nov 22 2023 Marian Csontos <mcsontos@redhat.com> - 1.6.0-1
 - Update to release 1.6.0.
 
