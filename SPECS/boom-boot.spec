@@ -2,13 +2,13 @@
 %global sphinx_docs 1
 
 Name:		boom-boot
-Version:	1.6.1
-Release:	2%{?dist}
+Version:	1.6.5
+Release:	1%{?dist}
 Summary:	%{summary}
 
 License:	GPL-2.0-only
-URL:		https://github.com/snapshotmanager/boom
-Source0:	https://github.com/snapshotmanager/boom/archive/%{version}/boom-%{version}.tar.gz
+URL:		https://github.com/snapshotmanager/boom-boot
+Source0:	%{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildArch:	noarch
 
@@ -20,10 +20,10 @@ BuildRequires:	python3-dbus
 BuildRequires:	python3-sphinx
 %endif
 BuildRequires: make
-BuildRequires: systemd-rpm-macros
 
 Requires: python3-boom = %{version}-%{release}
 Requires: %{name}-conf = %{version}-%{release}
+Requires: python3-dbus
 Requires: systemd >= 252-18
 
 Obsoletes: boom-boot-grub2 <= 1.3
@@ -74,20 +74,28 @@ include this support in both Red Hat Enterprise Linux 7 and Fedora).
 This package provides configuration files for boom.
 
 %prep
-%autosetup -p1 -n boom-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 %if 0%{?sphinx_docs}
-make -C doc html
+make %{?_smp_mflags} -C doc html
 rm doc/_build/html/.buildinfo
 mv doc/_build/html doc/html
 rm -r doc/_build
 %endif
 
+%if 0%{?centos} || 0%{?rhel}
 %py3_build
+%else
+%pyproject_wheel
+%endif
 
 %install
+%if 0%{?centos} || 0%{?rhel}
 %py3_install
+%else
+%pyproject_install
+%endif
 
 # Make configuration directories
 # mode 0700 - in line with /boot/grub2 directory:
@@ -102,9 +110,6 @@ mkdir -p ${RPM_BUILD_ROOT}/%{_mandir}/man5
 install -m 644 man/man8/boom.8 ${RPM_BUILD_ROOT}/%{_mandir}/man8
 install -m 644 man/man5/boom.5 ${RPM_BUILD_ROOT}/%{_mandir}/man5
 
-mkdir -p ${RPM_BUILD_ROOT}/%{_systemdgeneratordir}
-install -m 755 systemd/snapshot-remount-fs ${RPM_BUILD_ROOT}/%{_systemdgeneratordir}
-
 rm doc/Makefile
 rm doc/conf.py
 
@@ -116,13 +121,17 @@ rm doc/conf.py
 %license COPYING
 %doc README.md
 %{_bindir}/boom
-%{_systemdgeneratordir}/snapshot-remount-fs
 %doc %{_mandir}/man*/boom.*
 
 %files -n python3-boom
 %license COPYING
 %doc README.md
-%{python3_sitelib}/*
+%{python3_sitelib}/boom/
+%if 0%{?centos} || 0%{?rhel}
+%{python3_sitelib}/boom*.egg-info/
+%else
+%{python3_sitelib}/boom*.dist-info/
+%endif
 %doc doc
 %doc examples
 %doc tests
@@ -139,6 +148,10 @@ rm doc/conf.py
 
 
 %changelog
+* Fri Dec 13 2024 Bryn M. Reeves <bmr@redhat.com> - 1.6.5-1
+- Update to release 1.6.5.
+- Resolves: RHEL-59512
+
 * Tue May 21 2024 Bryan Gurney <bgurney@redhat.com> - 1.6.1-2
 - Add issues resolved by release 1.6.1
 - Resolves: RHEL-36001
