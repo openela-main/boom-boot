@@ -2,21 +2,19 @@
 %global sphinx_docs 1
 
 Name:		boom-boot
-Version:	1.6.5
-Release:	3%{?dist}
+Version:	1.6.8
+Release:	1%{?dist}
 Summary:	%{summary}
 
-License:	GPL-2.0-only
+License:	Apache-2.0
 URL:		https://github.com/snapshotmanager/boom-boot
 Source0:	%{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildArch:	noarch
 
 BuildRequires:	make
-BuildRequires:	python3-setuptools
 BuildRequires:	python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
+BuildRequires:  python3-pytest
 %if 0%{?sphinx_docs}
 BuildRequires:	python3-dbus
 BuildRequires:	python3-sphinx
@@ -82,6 +80,9 @@ This package provides configuration files for boom.
 %prep
 %autosetup -p1 -n %{name}-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
 %if 0%{?sphinx_docs}
 make %{?_smp_mflags} -C doc html
@@ -90,18 +91,10 @@ mv doc/_build/html doc/html
 rm -r doc/_build
 %endif
 
-%if 0%{?centos} || 0%{?rhel}
-%py3_build
-%else
 %pyproject_wheel
-%endif
 
 %install
-%if 0%{?centos} || 0%{?rhel}
-%py3_install
-%else
 %pyproject_install
-%endif
 
 # Make configuration directories
 # mode 0700 - in line with /boot/grub2 directory:
@@ -119,31 +112,26 @@ install -m 644 man/man5/boom.5 ${RPM_BUILD_ROOT}/%{_mandir}/man5
 rm doc/Makefile
 rm doc/conf.py
 
-# Test suite currently does not operate in rpmbuild environment
-#%%check
-#%%{__python3} setup.py test
+%check
+%pytest --log-level=debug -v tests/
 
 %files
-%license COPYING
+%license LICENSE
 %doc README.md
 %{_bindir}/boom
 %doc %{_mandir}/man*/boom.*
 
 %files -n python3-boom
-%license COPYING
+%license LICENSE
 %doc README.md
 %{python3_sitelib}/boom/*
-%if 0%{?centos} || 0%{?rhel}
-%{python3_sitelib}/boom*.egg-info/
-%else
 %{python3_sitelib}/boom*.dist-info/
-%endif
 %doc doc
 %doc examples
 %doc tests
 
 %files conf
-%license COPYING
+%license LICENSE
 %doc README.md
 %dir /boot/boom
 %config(noreplace) /boot/boom/boom.conf
@@ -154,6 +142,10 @@ rm doc/conf.py
 
 
 %changelog
+* Tue Nov 04 2025 Bryn M. Reeves <bmr@redhat.com> - 1.6.8-1
+- Update to release 1.6.8
+- Resolves: RHEL-111710
+
 * Fri Dec 13 2024 Bryn M. Reeves <bmr@redhat.com> - 1.6.5-1
 - Update to release 1.6.5
 - Resolves: RHEL-59511
